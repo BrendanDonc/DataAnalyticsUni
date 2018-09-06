@@ -1,55 +1,40 @@
-def preprocess(df):
-  #Preprocess data
-  import pandas as pd
-  df_raw = pd.read_csv('STUDENT.csv', index_col=0)
-  df = df_raw.drop(['InitialName', 'reason'], axis=1)
-  #Map binaries
-  address_map = { 'U':0, 'R':1 }
-  df['address'] = df['address'].map(address_map)
+# Task 1.2
+def preprocess():
+    import pandas as pd
+    #Preprocess data
+    df_raw = pd.read_csv('STUDENT.csv', index_col=0)
+    df = df_raw.drop(['InitialName', 'guardian'], axis=1)
+    
+    #Map binaries
+    df['address'] = df['address'].map({ 'U':0, 'R':1 })
+    df['sex'] = df['sex'].map({ 'M':0, 'F':1 })
+    df['famsize'] = df['famsize'].map({ 'LE3':0, 'GT3':1 })
+    df['Pstatus'] = df['Pstatus'].map({ 'A':0, 'T':1 })
+    df['schoolsup'] = df['schoolsup'].map({ 'no':0, 'yes':1 })
+    df['famsup'] = df['famsup'].map({ 'no':0, 'yes':1 })
+    df['paid'] = df['paid'].map({ 'no':0, 'yes':1 })
+    df['activities'] = df['activities'].map({ 'no':0, 'yes':1 })
+    df['nursery'] = df['nursery'].map({ 'no':0, 'yes':1 })
+    df['higher'] = df['higher'].map({ 'no':0, 'yes':1 })
+    df['internet'] = df['internet'].map({ 'no':0, 'yes':1 })
+    df['romantic'] = df['romantic'].map({ 'no':0, 'yes':1 })
+    df['G3'] = df['G3'].map({ 'FAIL': 0, 'PASS': 1 })
 
-  sex_map = { 'M':0, 'F':1 }
-  df['sex'] = df['sex'].map(sex_map)
+    #Fill via median for age
+    df['age'].fillna(df['age'].median(), inplace=True)
+    
+    #Fill via 'none' since hot encode will flag
+    df['school'].fillna('none', inplace=True)
+    df['reason'].fillna('none', inplace=True)
 
-  famsize_map = { 'LE3':0, 'GT3':1 }
-  df['famsize'] = df['famsize'].map(famsize_map)
+    #Drop g1 & 2 empty rows
+    df = df.drop(['G1', 'G2', 'failures'], axis=1)
+    #cols_miss_drop =['G1', 'G2']
+    #mask = pd.isnull(df['G1'])
+    #for col in cols_miss_drop:
+    # mask = mask | pd.isnull(df[col])
+    #df = df[~mask]
 
-  Pstatus_map = { 'A':0, 'T':1 }
-  df['Pstatus'] = df['Pstatus'].map(Pstatus_map)
-
-  schoolsup_map = { 'no':0, 'yes':1 }
-  df['schoolsup'] = df['schoolsup'].map(schoolsup_map)
-
-  famsup_map = { 'no':0, 'yes':1 }
-  df['famsup'] = df['famsup'].map(famsup_map)
-
-  paid_map = { 'no':0, 'yes':1 }
-  df['paid'] = df['paid'].map(paid_map)
-
-  activities_map = { 'no':0, 'yes':1 }
-  df['activities'] = df['activities'].map(activities_map)
-
-  nursery_map = { 'no':0, 'yes':1 }
-  df['nursery'] = df['nursery'].map(nursery_map)
-
-  higher_map = { 'no':0, 'yes':1 }
-  df['higher'] = df['higher'].map(higher_map)
-
-  internet_map = { 'no':0, 'yes':1 }
-  df['internet'] = df['internet'].map(internet_map)
-
-  romantic_map = { 'no':0, 'yes':1 }
-  df['romantic'] = df['romantic'].map(romantic_map)
-
-  g3_map = { 'FAIL': 0, 'PASS': 1 }
-  df['G3'] = df['G3'].map(g3_map)
-
-  #Flag school for missing vals (Dont need this cause no school is already 0)
-  #df['school_nan'] = pd.isnull(df['school'])
-  #df['school'].fillna(0, inplace=True)
-
-  #Fill via median for age
-  df['age'].fillna(df['age'].median(), inplace=True)
-
-  #Hot encode
-  df = pd.get_dummies(df)
-  return df
+    #Hot encode
+    df = pd.get_dummies(df)
+    return df
